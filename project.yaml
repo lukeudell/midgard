@@ -10,6 +10,7 @@ contract_version: "1.1"
 slug: home-network
 title: Home Network
 summary: A residential network run like production infrastructure, with nine segmented trust zones, default-deny between them, and documentation treated as a deliverable.
+repo_url: https://github.com/lukeudell/midgard
 published: false
 tags: [networking, documentation, self-hosting]
 
