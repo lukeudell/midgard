@@ -1,0 +1,216 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import RetroWindow from '../../../components/RetroWindow.astro';
+---
+
+<BaseLayout title="Network Documentation" description="Documentation-as-infrastructure: the README has a README.">
+  <section class="mx-auto max-w-5xl px-4 sm:px-6 py-12">
+    <h1 class="font-heading text-2xl sm:text-4xl tracking-widest glow-cyan mb-2">
+      DOCUMENTATION
+    </h1>
+    <p class="font-terminal text-sm text-[var(--color-green)] mb-10">
+      &gt; tree --dirsfirst -I 'archive|assets'
+    </p>
+
+    <div class="space-y-8 stagger-children">
+      <!-- The meta-argument -->
+      <RetroWindow title="THE README HAS A README">
+        <div class="font-body text-sm text-[var(--color-white)]/80 leading-relaxed space-y-4">
+          <p>
+            The network documentation isn't an afterthought: it's a deliverable. The README
+            alone is a structured reference with a table of contents, navigation guide, and
+            version history. Behind it are 15+ pages organized into four categories, covering
+            everything from hardware configuration to operational runbooks.
+          </p>
+          <p>
+            The goal is the same one I have for any system I build: if I get hit by a bus,
+            someone else can pick this up and run it. In this case "someone else" is probably
+            future me after not touching it for six months, which is functionally the same problem.
+          </p>
+        </div>
+      </RetroWindow>
+
+      <!-- Document Tree -->
+      <RetroWindow title="DOCUMENTATION STRUCTURE">
+        <div class="font-terminal text-xs text-[var(--color-white)]/70 leading-relaxed">
+          <pre class="overflow-x-auto"><span class="text-[var(--color-cyan)]">Twilight-Zone-Network/</span>
+├── <span class="text-[var(--color-green)]">README.md</span>                    <span class="text-[var(--color-white)]/40">← Primary reference (you're reading about it)</span>
+├── <span class="text-[var(--color-amber)]">Missing-Info.md</span>              <span class="text-[var(--color-white)]/40">← Active backlog of gaps to fill</span>
+│
+├── <span class="text-[var(--color-cyan)]">01-Configuration/</span>            <span class="text-[var(--color-white)]/40">← How things are set up</span>
+│   ├── Hardware-Configuration.md
+│   ├── Controller-Configuration.md
+│   ├── Pi-Software-Configuration.md
+│   ├── Server-Software-Configuration.md
+│   └── Surveillance-Configuration.md
+│
+├── <span class="text-[var(--color-cyan)]">02-Reference/</span>                <span class="text-[var(--color-white)]/40">← Standards and lookups</span>
+│   ├── Naming-Conventions.md
+│   ├── Password-Standards.md
+│   └── Port-Reference.csv
+│
+├── <span class="text-[var(--color-cyan)]">03-Operations/</span>               <span class="text-[var(--color-white)]/40">← How to do things</span>
+│   ├── Reboot-Instructions.md
+│   ├── VPN-Cheatsheet.md
+│   ├── Security-Cheatsheet.md
+│   ├── Display-Cheatsheet.md
+│   ├── Maintenance-Procedures.md
+│   ├── Monitoring-and-Logging.md
+│   ├── Backup-Procedures.md
+│   └── Troubleshooting-Guide.md
+│
+└── <span class="text-[var(--color-cyan)]">04-Scripts/</span>                  <span class="text-[var(--color-white)]/40">← Automation</span>
+    ├── Script-Guide.md
+    ├── Database/
+    ├── Pi/
+    └── Windows/</pre>
+        </div>
+      </RetroWindow>
+
+      <!-- Four Categories Explained -->
+      <RetroWindow title="DOCUMENTATION CATEGORIES">
+        <div class="grid sm:grid-cols-2 gap-6">
+          <div>
+            <p class="font-terminal text-sm text-[var(--color-cyan)] mb-3">01-CONFIGURATION</p>
+            <p class="font-body text-sm text-[var(--color-white)]/70 leading-relaxed mb-2">
+              The "what is it and how is it set up" section. Hardware specs, software
+              configuration, controller settings, service parameters. Written so you can
+              rebuild any component from the doc alone.
+            </p>
+            <p class="font-terminal text-xs text-[var(--color-white)]/40">
+              5 documents covering every major component
+            </p>
+          </div>
+          <div>
+            <p class="font-terminal text-sm text-[var(--color-amber)] mb-3">02-REFERENCE</p>
+            <p class="font-body text-sm text-[var(--color-white)]/70 leading-relaxed mb-2">
+              Quick-lookup material. The naming convention doc explains the Twilight Zone
+              theme and how to name new devices. Password standards define complexity
+              and rotation. The port reference is a CSV for easy searching.
+            </p>
+            <p class="font-terminal text-xs text-[var(--color-white)]/40">
+              3 documents: standards that prevent drift
+            </p>
+          </div>
+          <div>
+            <p class="font-terminal text-sm text-[var(--color-green)] mb-3">03-OPERATIONS</p>
+            <p class="font-body text-sm text-[var(--color-white)]/70 leading-relaxed mb-2">
+              Runbooks for common tasks. "How do I reboot the Pi safely?" "How do I
+              add a VPN client?" "What do I check during monthly maintenance?" These are
+              the docs that save you at 2am when something breaks and you can't remember
+              the right command sequence.
+            </p>
+            <p class="font-terminal text-xs text-[var(--color-white)]/40">
+              8 documents, the largest section, by design
+            </p>
+          </div>
+          <div>
+            <p class="font-terminal text-sm text-[var(--color-pink)] mb-3">04-SCRIPTS</p>
+            <p class="font-body text-sm text-[var(--color-white)]/70 leading-relaxed mb-2">
+              Automation code with documentation. Database maintenance scripts,
+              Pi service management, Windows client utilities. Each script has a
+              guide explaining what it does, when to run it, and what to expect.
+            </p>
+            <p class="font-terminal text-xs text-[var(--color-white)]/40">
+              Script guide + organized by platform
+            </p>
+          </div>
+        </div>
+      </RetroWindow>
+
+      <!-- Documentation Practices -->
+      <RetroWindow title="DOCUMENTATION PRACTICES">
+        <div class="space-y-4 font-body text-sm text-[var(--color-white)]/80 leading-relaxed">
+          <div class="flex gap-3">
+            <span class="font-terminal text-[var(--color-cyan)] shrink-0">&gt;</span>
+            <div>
+              <p class="font-terminal text-[var(--color-pink)] mb-1">Version Control</p>
+              <p>
+                The documentation lives in a Git repository with a changelog in the README.
+                Major architecture changes trigger a version bump. The current version is 5.1,
+                reflecting the migration from a previous gateway platform.
+              </p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <span class="font-terminal text-[var(--color-cyan)] shrink-0">&gt;</span>
+            <div>
+              <p class="font-terminal text-[var(--color-pink)] mb-1">Living Documentation</p>
+              <p>
+                There's a <span class="font-terminal text-[var(--color-amber)]">Missing-Info.md</span> file
+                that tracks documentation gaps: an active backlog of things that need to be
+                written or updated. The docs are never "done," just like the network.
+              </p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <span class="font-terminal text-[var(--color-cyan)] shrink-0">&gt;</span>
+            <div>
+              <p class="font-terminal text-[var(--color-pink)] mb-1">Naming Conventions</p>
+              <p>
+                A dedicated document defines the naming scheme for every device, VLAN,
+                and service on the network. New components get named following the convention,
+                not whatever seemed clever at the time. Consistency over creativity.
+              </p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <span class="font-terminal text-[var(--color-cyan)] shrink-0">&gt;</span>
+            <div>
+              <p class="font-terminal text-[var(--color-pink)] mb-1">Quarterly Review</p>
+              <p>
+                The documentation has a defined review cadence. After major architecture
+                changes or quarterly, whichever comes first. This prevents the most common
+                failure mode of documentation: it's accurate on day one and wrong by month three.
+              </p>
+            </div>
+          </div>
+        </div>
+      </RetroWindow>
+
+      <!-- The pattern -->
+      <RetroWindow title="THE SAME PATTERN">
+        <div class="font-body text-sm text-[var(--color-white)]/80 leading-relaxed space-y-4">
+          <p>
+            This documentation structure mirrors what I build professionally:
+          </p>
+          <div class="overflow-x-auto">
+            <table class="w-full font-terminal text-xs mt-2">
+              <thead>
+                <tr class="text-left border-b border-[var(--color-border)]">
+                  <th class="py-2 pr-4 text-[var(--color-cyan)]">HOME NETWORK</th>
+                  <th class="py-2 pr-4 text-[var(--color-cyan)]">EQUIVALENT AT WORK</th>
+                </tr>
+              </thead>
+              <tbody class="text-[var(--color-white)]/70">
+                <tr class="border-b border-[var(--color-border)]/30">
+                  <td class="py-2 pr-4">01-Configuration</td>
+                  <td class="py-2 pr-4">Infrastructure-as-code, environment setup guides</td>
+                </tr>
+                <tr class="border-b border-[var(--color-border)]/30">
+                  <td class="py-2 pr-4">02-Reference</td>
+                  <td class="py-2 pr-4">ADRs, coding standards, schema documentation</td>
+                </tr>
+                <tr class="border-b border-[var(--color-border)]/30">
+                  <td class="py-2 pr-4">03-Operations</td>
+                  <td class="py-2 pr-4">Runbooks, incident response playbooks, on-call guides</td>
+                </tr>
+                <tr class="border-b border-[var(--color-border)]/30">
+                  <td class="py-2 pr-4">04-Scripts</td>
+                  <td class="py-2 pr-4">CI/CD pipelines, migration scripts, automation</td>
+                </tr>
+                <tr>
+                  <td class="py-2 pr-4">Missing-Info.md</td>
+                  <td class="py-2 pr-4">Documentation debt backlog</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="font-terminal text-xs text-[var(--color-green)] mt-2">
+            &gt; The tools change. The pattern doesn't.
+          </p>
+        </div>
+      </RetroWindow>
+    </div>
+  </section>
+</BaseLayout>

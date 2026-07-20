@@ -1,0 +1,31 @@
+%% Network topology: the physical path from the internet inward.
+%% Nodes are ROLES, never hostnames or addresses -- see CLAUDE.md. A reader should
+%% be able to rebuild the shape of this network without being able to find it.
+%% Colour is left to the renderer; classes carry the trust tier, not a palette.
+graph TD
+    ISP["Internet"] --> MODEM["Cable Modem<br/>Bridge Mode"]
+    MODEM --> GW["Gateway / Firewall<br/>Routing + Control Plane"]
+    GW --> SW["Core Switch<br/>Managed PoE, VLAN Trunking"]
+
+    SW --> AP["Wireless APs<br/>SSID to Zone Mapping"]
+    SW --> PI["Infrastructure Node<br/>DNS / VPN / ETL / WoL"]
+    SW --> SRV["Compute Server<br/>Powered On Demand"]
+    SW --> NVR["Video Recorder<br/>Air-Gapped"]
+    SW --> CAMS["Surveillance Cameras<br/>Local Recording Only"]
+
+    AP --> WIFI["Wireless Clients<br/>Zone assigned by SSID"]
+    SW --> WIRED["Wired Clients<br/>Zone assigned by port"]
+
+    classDef external stroke-width:2px,stroke-dasharray:4 3
+    classDef critical stroke-width:3px
+    classDef infra stroke-width:3px
+    classDef ondemand stroke-width:2px
+    classDef isolated stroke-width:3px,stroke-dasharray:2 2
+    classDef client stroke-width:1px
+
+    class ISP,MODEM external
+    class GW,SW critical
+    class PI infra
+    class SRV ondemand
+    class NVR,CAMS isolated
+    class AP,WIFI,WIRED client

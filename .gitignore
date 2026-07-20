@@ -1,0 +1,28 @@
+# secrets: never commit
+.env
+*.env
+!.env.example
+
+# nothing from the private vault belongs here
+private/
+*.pdf
+
+# vault exports arrive in these shapes. Blocked at the extension so a diagram or a
+# spreadsheet dragged in during a late-night edit cannot be added by `git add .`.
+*.csv
+*.xlsx
+*.drawio
+*.vsdx
+
+# agent tooling. Per-machine settings record permission grants and command history,
+# which is machine state rather than project state. Previously covered only by a
+# machine-global ignore, so a fresh clone elsewhere would have made them committable.
+#
+# Written as a glob rather than the literal filename on purpose: the sanitisation
+# guard's hostname pattern matches the mDNS suffix in that name and fires on it. The
+# repo's rule is to rewrite the text rather than weaken the pattern, and this glob is
+# that rewrite. Shared project settings (.claude/settings.json) still commit normally.
+.claude/settings.*.json
+
+.DS_Store
+Thumbs.db

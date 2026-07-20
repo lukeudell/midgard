@@ -1,0 +1,169 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import RetroWindow from '../../../components/RetroWindow.astro';
+import MermaidDiagram from '../../../components/MermaidDiagram.astro';
+
+const dnsChart = `graph LR
+    CLIENT["Any Device\\nAll VLANs"] -->|"DNS query"| PIHOLE["Pi-hole\\nFilter + Cache"]
+    PIHOLE -->|"Allowed"| UNBOUND["Unbound\\nRecursive Resolver"]
+    UNBOUND -->|"Direct query"| ROOT["Authoritative\\nNameservers"]
+    PIHOLE -.->|"Blocked"| SINK["Sinkhole\\n0.0.0.0"]
+
+    style CLIENT fill:#0B0014,stroke:#E8E8E8,color:#E8E8E8
+    style PIHOLE fill:#0B0014,stroke:#39FF14,color:#39FF14
+    style UNBOUND fill:#0B0014,stroke:#00FFFF,color:#00FFFF
+    style ROOT fill:#0B0014,stroke:#7B2FBE,color:#7B2FBE
+    style SINK fill:#0B0014,stroke:#FF0000,color:#FF0000`;
+
+const serviceChart = `graph TD
+    PI["Infrastructure Node\\nAlways On"] --> PIHOLE["Pi-hole\\nDNS Filtering"]
+    PI --> UNBOUND["Unbound\\nRecursive DNS"]
+    PI --> VPN["WireGuard\\nVPN Server"]
+    PI --> ETL["Network ETL\\nPython + systemd"]
+    PI --> WOL["Wake-on-LAN\\nPower Management"]
+    PI --> HMI["HMI Dashboard\\nStatus Display"]
+
+    PIHOLE --> UNBOUND
+    ETL --> DB[("PostgreSQL\\nTelemetry Store")]
+    ETL --> ALERTS["Email Alerts\\nOffline / New Device"]
+    WOL -->|"Magic packet"| SRV["Compute Server"]
+    SRV --> PLEX["Media Server"]
+    SRV --> AUTO["Media Automation"]
+    VPN -.->|"Remote access"| PI
+
+    style PI fill:#0B0014,stroke:#39FF14,color:#39FF14
+    style PIHOLE fill:#0B0014,stroke:#39FF14,color:#39FF14
+    style UNBOUND fill:#0B0014,stroke:#00FFFF,color:#00FFFF
+    style VPN fill:#0B0014,stroke:#7B2FBE,color:#7B2FBE
+    style ETL fill:#0B0014,stroke:#FF00FF,color:#FF00FF
+    style WOL fill:#0B0014,stroke:#FF6B35,color:#FF6B35
+    style HMI fill:#0B0014,stroke:#FF6B35,color:#FF6B35
+    style DB fill:#0B0014,stroke:#FF00FF,color:#FF00FF
+    style ALERTS fill:#0B0014,stroke:#FF00FF,color:#FF00FF
+    style SRV fill:#0B0014,stroke:#7B2FBE,color:#7B2FBE
+    style PLEX fill:#0B0014,stroke:#7B2FBE,color:#7B2FBE
+    style AUTO fill:#0B0014,stroke:#7B2FBE,color:#7B2FBE`;
+---
+
+<BaseLayout title="Network Services" description="DNS sovereignty, VPN, network ETL, power automation: the always-on infrastructure layer.">
+  <section class="mx-auto max-w-5xl px-4 sm:px-6 py-12">
+    <h1 class="font-heading text-2xl sm:text-4xl tracking-widest glow-cyan mb-2">
+      NETWORK SERVICES
+    </h1>
+    <p class="font-terminal text-sm text-[var(--color-green)] mb-10">
+      &gt; systemctl list-units --type=service --state=running
+    </p>
+
+    <div class="space-y-8 stagger-children">
+      <!-- DNS Resolution Chain -->
+      <MermaidDiagram title="DNS RESOLUTION CHAIN" chart={dnsChart} />
+
+      <!-- DNS Explanation -->
+      <RetroWindow title="DNS SOVEREIGNTY">
+        <div class="font-body text-sm text-[var(--color-white)]/80 leading-relaxed space-y-4">
+          <p>
+            Every DNS query on the network passes through two layers before reaching the internet.
+            Pi-hole handles filtering: ads, trackers, malware domains, and age-inappropriate
+            content are blocked before they ever resolve. Queries that pass the filter go to
+            Unbound, a recursive resolver that talks directly to authoritative nameservers.
+          </p>
+          <p>
+            The result: <span class="font-terminal text-[var(--color-cyan)]">no third-party DNS
+            provider ever sees a query</span>. Not Google, not Cloudflare, not the ISP.
+            DNSSEC validation is enforced. Alternate DNS paths (DoH, DoT, direct resolver
+            queries from devices) are blocked at the firewall, so there's no way around Pi-hole.
+          </p>
+          <div class="grid sm:grid-cols-3 gap-3 font-terminal text-xs mt-4">
+            <div class="p-3 rounded bg-[var(--color-bg)] border border-[var(--color-green)]/30">
+              <p class="text-[var(--color-green)] mb-1">FILTERING</p>
+              <p class="text-[var(--color-white)]/50">Multiple curated blocklists. Age-appropriate filtering for children's zone.</p>
+            </div>
+            <div class="p-3 rounded bg-[var(--color-bg)] border border-[var(--color-cyan)]/30">
+              <p class="text-[var(--color-cyan)] mb-1">PRIVACY</p>
+              <p class="text-[var(--color-white)]/50">Recursive resolution direct to root. No forwarding to public resolvers.</p>
+            </div>
+            <div class="p-3 rounded bg-[var(--color-bg)] border border-[var(--color-pink)]/30">
+              <p class="text-[var(--color-pink)] mb-1">ENFORCEMENT</p>
+              <p class="text-[var(--color-white)]/50">Firewall blocks alternate DNS. No device can bypass Pi-hole.</p>
+            </div>
+          </div>
+        </div>
+      </RetroWindow>
+
+      <!-- Service Dependency Map -->
+      <MermaidDiagram title="SERVICE DEPENDENCY MAP" chart={serviceChart} />
+
+      <!-- VPN -->
+      <RetroWindow title="VPN: SECURE REMOTE ACCESS">
+        <div class="font-body text-sm text-[var(--color-white)]/80 leading-relaxed space-y-4">
+          <p>
+            WireGuard provides remote access with VLAN-aware routing. VPN clients are
+            routed into the trusted zone with access to infrastructure, media, and
+            surveillance. DNS queries from VPN clients go through Pi-hole, with the same filtering
+            and privacy protections as being on the local network.
+          </p>
+          <div class="font-terminal text-xs space-y-1 text-[var(--color-white)]/60 mt-2">
+            <p>&gt; Protocol: WireGuard (ChaCha20, Curve25519)</p>
+            <p>&gt; Access: Trusted zone + infrastructure + media + surveillance</p>
+            <p>&gt; DNS: Forced through Pi-hole</p>
+            <p>&gt; Use cases: Remote camera viewing, network management, secure browsing</p>
+          </div>
+        </div>
+      </RetroWindow>
+
+      <!-- Network ETL -->
+      <RetroWindow title="NETWORK ETL PIPELINE">
+        <div class="font-body text-sm text-[var(--color-white)]/80 leading-relaxed space-y-4">
+          <p>
+            A Python ETL pipeline runs on a systemd timer every 15 minutes. It pulls data
+            from the network controller API: device state, client connections, traffic
+            statistics, network events, and loads it into a local PostgreSQL instance.
+          </p>
+          <p>
+            This isn't just monitoring for monitoring's sake. The stored data enables:
+          </p>
+          <div class="grid sm:grid-cols-2 gap-3 font-terminal text-xs mt-2">
+            <div class="p-3 rounded bg-[var(--color-bg)] border border-[var(--color-cyan)]/30">
+              <p class="text-[var(--color-cyan)] mb-1">ALERTING</p>
+              <p class="text-[var(--color-white)]/50">Email notifications for offline devices and new client detection.</p>
+            </div>
+            <div class="p-3 rounded bg-[var(--color-bg)] border border-[var(--color-green)]/30">
+              <p class="text-[var(--color-green)] mb-1">HISTORICAL ANALYSIS</p>
+              <p class="text-[var(--color-white)]/50">Traffic trends, device uptime history, daily aggregate statistics.</p>
+            </div>
+            <div class="p-3 rounded bg-[var(--color-bg)] border border-[var(--color-pink)]/30">
+              <p class="text-[var(--color-pink)] mb-1">ANOMALY DETECTION</p>
+              <p class="text-[var(--color-white)]/50">Identify unexpected devices, unusual traffic patterns, firmware drift.</p>
+            </div>
+            <div class="p-3 rounded bg-[var(--color-bg)] border border-[var(--color-amber)]/30">
+              <p class="text-[var(--color-amber)] mb-1">AUDIT TRAIL</p>
+              <p class="text-[var(--color-white)]/50">Who connected, when, to which VLAN, and how much bandwidth they used.</p>
+            </div>
+          </div>
+        </div>
+      </RetroWindow>
+
+      <!-- Power Management -->
+      <RetroWindow title="POWER MANAGEMENT: WAKE-ON-LAN">
+        <div class="font-body text-sm text-[var(--color-white)]/80 leading-relaxed space-y-4">
+          <p>
+            The compute server is normally powered off. It draws significant wattage at idle,
+            and media services are used episodically. The infrastructure node manages its
+            power lifecycle:
+          </p>
+          <div class="font-terminal text-xs space-y-1 text-[var(--color-white)]/60 mt-2">
+            <p>&gt; Manual trigger via HMI touchscreen dashboard</p>
+            <p>&gt; Scheduled power-on (e.g., weekday evenings)</p>
+            <p>&gt; API webhook trigger (future: media request auto-power)</p>
+            <p>&gt; Remote trigger via VPN</p>
+          </div>
+          <p>
+            The HMI dashboard, a 10" touchscreen mounted on the infrastructure node,
+            provides at-a-glance status for all services: DNS query stats, active VPN
+            connections, VLAN utilization, and the big red power button for the compute server.
+          </p>
+        </div>
+      </RetroWindow>
+    </div>
+  </section>
+</BaseLayout>
