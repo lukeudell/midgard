@@ -1,0 +1,138 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import RetroWindow from '../../../components/RetroWindow.astro';
+import MermaidDiagram from '../../../components/MermaidDiagram.astro';
+
+const topologyChart = `graph TD
+    ISP["Internet"] --> MODEM["Cable Modem\\nBridge Mode"]
+    MODEM --> GW["Gateway / Firewall\\nRouter + Controller"]
+    GW --> SW["Core Switch\\nManaged PoE - VLAN Trunking"]
+
+    SW --> AP1["Wireless APs\\nSSID to VLAN Mapping"]
+    SW --> PI["Infrastructure Node\\nDNS / VPN / ETL / WoL"]
+    SW --> SRV["Compute Server\\nOn-Demand Power"]
+    SW --> NVR["Video Recorder\\nAir-Gapped - No Internet"]
+    SW --> CAMS["Surveillance Cameras\\nLocal Recording Only"]
+
+    AP1 --> WIFI_CLIENTS["Wireless Clients\\nAssigned to VLAN by SSID"]
+    SW --> WIRED["Wired Clients\\nAssigned to VLAN by Port"]
+
+    PI -.->|"Wake-on-LAN"| SRV
+    PI -.->|"DNS for all VLANs"| SW
+
+    style ISP fill:#0B0014,stroke:#FF6B35,color:#FF6B35
+    style GW fill:#0B0014,stroke:#00FFFF,color:#00FFFF
+    style SW fill:#0B0014,stroke:#00FFFF,color:#00FFFF
+    style PI fill:#0B0014,stroke:#39FF14,color:#39FF14
+    style SRV fill:#0B0014,stroke:#7B2FBE,color:#7B2FBE
+    style NVR fill:#0B0014,stroke:#FF0000,color:#FF0000
+    style CAMS fill:#0B0014,stroke:#FF0000,color:#FF0000
+    style AP1 fill:#0B0014,stroke:#FF00FF,color:#FF00FF
+    style WIFI_CLIENTS fill:#0B0014,stroke:#E8E8E8,color:#E8E8E8
+    style WIRED fill:#0B0014,stroke:#E8E8E8,color:#E8E8E8
+    style MODEM fill:#0B0014,stroke:#FF6B35,color:#FF6B35`;
+---
+
+<BaseLayout title="Network Architecture" description="Home network topology: gateway, core switch, infrastructure node, compute server, wireless APs.">
+  <section class="mx-auto max-w-5xl px-4 sm:px-6 py-12">
+    <h1 class="font-heading text-2xl sm:text-4xl tracking-widest glow-cyan mb-2">
+      NETWORK ARCHITECTURE
+    </h1>
+    <p class="font-terminal text-sm text-[var(--color-green)] mb-10">
+      &gt; cat /etc/network/topology.conf
+    </p>
+
+    <div class="space-y-8 stagger-children">
+      <!-- Network Topology Diagram -->
+      <MermaidDiagram title="NETWORK TOPOLOGY" chart={topologyChart} />
+
+      <!-- Infrastructure Roles -->
+      <RetroWindow title="INFRASTRUCTURE ROLES">
+        <div class="overflow-x-auto">
+          <table class="w-full font-terminal text-xs">
+            <thead>
+              <tr class="text-left border-b border-[var(--color-border)]">
+                <th class="py-2 pr-4 text-[var(--color-cyan)]">COMPONENT</th>
+                <th class="py-2 pr-4 text-[var(--color-cyan)]">ROLE</th>
+                <th class="py-2 text-[var(--color-cyan)]">CRITICALITY</th>
+              </tr>
+            </thead>
+            <tbody class="text-[var(--color-white)]/70">
+              <tr class="border-b border-[var(--color-border)]/30">
+                <td class="py-2 pr-4 text-[var(--color-amber)]">Gateway</td>
+                <td class="py-2 pr-4">Routing, firewall, VLAN isolation, controller</td>
+                <td class="py-2"><span class="text-red-400">Critical</span></td>
+              </tr>
+              <tr class="border-b border-[var(--color-border)]/30">
+                <td class="py-2 pr-4 text-[var(--color-amber)]">Core Switch</td>
+                <td class="py-2 pr-4">VLAN trunking, PoE for APs and cameras</td>
+                <td class="py-2"><span class="text-red-400">Critical</span></td>
+              </tr>
+              <tr class="border-b border-[var(--color-border)]/30">
+                <td class="py-2 pr-4 text-[var(--color-amber)]">Infrastructure Node</td>
+                <td class="py-2 pr-4">DNS (Pi-hole + Unbound), VPN, ETL, Wake-on-LAN</td>
+                <td class="py-2"><span class="text-red-400">Critical</span></td>
+              </tr>
+              <tr class="border-b border-[var(--color-border)]/30">
+                <td class="py-2 pr-4 text-[var(--color-amber)]">Wireless APs</td>
+                <td class="py-2 pr-4">SSID-to-VLAN mapping, wireless access</td>
+                <td class="py-2"><span class="text-[var(--color-amber)]">High</span></td>
+              </tr>
+              <tr class="border-b border-[var(--color-border)]/30">
+                <td class="py-2 pr-4 text-[var(--color-amber)]">Compute Server</td>
+                <td class="py-2 pr-4">Media services, lab workloads, on-demand</td>
+                <td class="py-2"><span class="text-[var(--color-white)]/50">Medium</span></td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-4 text-[var(--color-amber)]">Video Recorder</td>
+                <td class="py-2 pr-4">Local camera recording, air-gapped from internet</td>
+                <td class="py-2"><span class="text-[var(--color-white)]/50">Medium</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </RetroWindow>
+
+      <!-- Design Decisions -->
+      <RetroWindow title="KEY ARCHITECTURE DECISIONS">
+        <div class="space-y-4 font-body text-sm text-[var(--color-white)]/80 leading-relaxed">
+          <div>
+            <p class="font-terminal text-[var(--color-pink)] mb-1">Bridge Mode Modem</p>
+            <p>
+              ISP modem runs in bridge mode: no double NAT, no ISP-controlled routing.
+              The gateway handles all routing decisions, giving full control over traffic
+              flow and firewall rules.
+            </p>
+          </div>
+          <div>
+            <p class="font-terminal text-[var(--color-pink)] mb-1">On-Demand Compute</p>
+            <p>
+              The compute server draws significant power at idle. Rather than running 24/7,
+              it's powered on via Wake-on-LAN from the infrastructure node, either on schedule,
+              by manual trigger, or via API webhook. Media services are used episodically,
+              so the server matches that usage pattern.
+            </p>
+          </div>
+          <div>
+            <p class="font-terminal text-[var(--color-pink)] mb-1">Air-Gapped Surveillance</p>
+            <p>
+              Cameras and the video recorder have zero internet access by design.
+              Footage stays on-premises. Remote viewing is only available through the
+              VPN tunnel, never through cloud relay services.
+            </p>
+          </div>
+          <div>
+            <p class="font-terminal text-[var(--color-pink)] mb-1">Single Infrastructure Node</p>
+            <p>
+              DNS, VPN, ETL, and power management all run on one always-on device.
+              This is a deliberate tradeoff: single point of failure for non-critical services,
+              but minimal power draw and operational simplicity for a home environment.
+              The gateway continues routing if this node goes down; only DNS filtering
+              and VPN access are affected.
+            </p>
+          </div>
+        </div>
+      </RetroWindow>
+    </div>
+  </section>
+</BaseLayout>

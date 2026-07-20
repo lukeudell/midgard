@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import RetroWindow from '../../../components/RetroWindow.astro';
+import MermaidDiagram from '../../../components/MermaidDiagram.astro';
+
+const trustChart = `graph TD
+    INFRA["Infrastructure\\nManagement Plane"] --> TRUSTED["Trusted Personal\\nAdmin Devices"]
+    TRUSTED --> WORK["Work Devices\\nEmployer-Managed"]
+    TRUSTED --> KIDS["Children's Devices\\nContent-Filtered"]
+    WORK --> MEDIA["Media / Streaming\\nEntertainment"]
+    KIDS --> MEDIA
+    MEDIA --> IOT["IoT Devices\\nSmart Home"]
+    IOT --> GUEST["Guest Network\\nInternet Only"]
+    CAM["Surveillance\\nAir-Gapped"] -.->|"View-only access\\nfrom Infrastructure"| INFRA
+
+    style INFRA fill:#0B0014,stroke:#00FFFF,color:#00FFFF
+    style TRUSTED fill:#0B0014,stroke:#39FF14,color:#39FF14
+    style WORK fill:#0B0014,stroke:#7B2FBE,color:#7B2FBE
+    style KIDS fill:#0B0014,stroke:#FF6B35,color:#FF6B35
+    style MEDIA fill:#0B0014,stroke:#FF00FF,color:#FF00FF
+    style IOT fill:#0B0014,stroke:#E8E8E8,color:#E8E8E8
+    style GUEST fill:#0B0014,stroke:#E8E8E8,color:#666666
+    style CAM fill:#0B0014,stroke:#FF0000,color:#FF0000`;
+---
+
+<BaseLayout title="Network Segmentation" description="9-VLAN zero-trust segmentation with trust hierarchy and inter-zone access control.">
+  <section class="mx-auto max-w-5xl px-4 sm:px-6 py-12">
+    <h1 class="font-heading text-2xl sm:text-4xl tracking-widest glow-cyan mb-2">
+      NETWORK SEGMENTATION
+    </h1>
+    <p class="font-terminal text-sm text-[var(--color-green)] mb-10">
+      &gt; iptables -L --line-numbers | grep VLAN
+    </p>
+
+    <div class="space-y-8 stagger-children">
+      <!-- Trust Hierarchy Diagram -->
+      <MermaidDiagram title="TRUST HIERARCHY" chart={trustChart} />
+
+      <!-- VLAN Reference Table -->
+      <RetroWindow title="VLAN REFERENCE">
+        <div class="overflow-x-auto">
+          <table class="w-full font-terminal text-xs">
+            <thead>
+              <tr class="text-left border-b border-[var(--color-border)]">
+                <th class="py-2 pr-3 text-[var(--color-cyan)]">ZONE NAME</th>
+                <th class="py-2 pr-3 text-[var(--color-cyan)]">PURPOSE</th>
+                <th class="py-2 pr-3 text-[var(--color-cyan)]">TRUST</th>
+                <th class="py-2 text-[var(--color-cyan)]">INTERNET</th>
+              </tr>
+            </thead>
+            <tbody class="text-[var(--color-white)]/70">
+              <tr class="border-b border-[var(--color-border)]/30">
+                <td class="py-2 pr-3 text-[var(--color-cyan)]">The Fifth Dimension</td>
+                <td class="py-2 pr-3">Network infrastructure, management plane</td>
+                <td class="py-2 pr-3"><span class="text-[var(--color-cyan)]">Highest</span></td>
+                <td class="py-2">Yes</td>
+              </tr>
+              <tr class="border-b border-[var(--color-border)]/30">
+                <td class="py-2 pr-3 text-[var(--color-green)]">Beyond the Pale</td>
+                <td class="py-2 pr-3">Trusted personal devices (admin access)</td>
+                <td class="py-2 pr-3"><span class="text-[var(--color-green)]">High</span></td>
+                <td class="py-2">Yes</td>
+              </tr>
+              <tr class="border-b border-[var(--color-border)]/30">
+                <td class="py-2 pr-3 text-[var(--color-violet)]">Sector 51</td>
+                <td class="py-2 pr-3">Employer-managed work devices</td>
+                <td class="py-2 pr-3"><span class="text-[var(--color-violet)]">Isolated</span></td>
+                <td class="py-2">Yes</td>
+              </tr>
+              <tr class="border-b border-[var(--color-border)]/30">
+                <td class="py-2 pr-3 text-[var(--color-amber)]">Junior Dimension</td>
+                <td class="py-2 pr-3">Children's devices, content-filtered</td>
+                <td class="py-2 pr-3"><span class="text-[var(--color-amber)]">Restricted</span></td>
+                <td class="py-2">Filtered</td>
+              </tr>
+              <tr class="border-b border-[var(--color-border)]/30">
+                <td class="py-2 pr-3 text-[var(--color-pink)]">The Viewing Chamber</td>
+                <td class="py-2 pr-3">TVs, streaming devices</td>
+                <td class="py-2 pr-3"><span class="text-[var(--color-white)]/50">Low</span></td>
+                <td class="py-2">Yes</td>
+              </tr>
+              <tr class="border-b border-[var(--color-border)]/30">
+                <td class="py-2 pr-3 text-[var(--color-pink)]">The Loading Dock</td>
+                <td class="py-2 pr-3">Media ingest, download quarantine</td>
+                <td class="py-2 pr-3"><span class="text-[var(--color-white)]/50">Low</span></td>
+                <td class="py-2">Yes</td>
+              </tr>
+              <tr class="border-b border-[var(--color-border)]/30">
+                <td class="py-2 pr-3 text-[var(--color-white)]/50">The Machine Realm</td>
+                <td class="py-2 pr-3">IoT, smart home devices</td>
+                <td class="py-2 pr-3"><span class="text-[var(--color-white)]/30">Very Low</span></td>
+                <td class="py-2">Limited</td>
+              </tr>
+              <tr class="border-b border-[var(--color-border)]/30">
+                <td class="py-2 pr-3 text-[var(--color-white)]/50">The Outer Limits</td>
+                <td class="py-2 pr-3">Guest devices, internet only</td>
+                <td class="py-2 pr-3"><span class="text-[var(--color-white)]/30">Lowest</span></td>
+                <td class="py-2">Yes</td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-3 text-red-400">The Surveillance Sector</td>
+                <td class="py-2 pr-3">Cameras, video recorder, local only</td>
+                <td class="py-2 pr-3"><span class="text-red-400">Special</span></td>
+                <td class="py-2"><span class="text-red-400">Blocked</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </RetroWindow>
+
+      <!-- Inter-Zone Access Pattern -->
+      <RetroWindow title="INTER-ZONE ACCESS PATTERNS">
+        <div class="font-body text-sm text-[var(--color-white)]/80 leading-relaxed space-y-4">
+          <p>
+            The default rule is <span class="font-terminal text-[var(--color-cyan)]">DENY ALL</span>.
+            Every allowed path is an explicit exception with a documented reason. The key patterns:
+          </p>
+          <div class="grid sm:grid-cols-2 gap-3 font-terminal text-xs">
+            <div class="p-3 rounded bg-[var(--color-bg)] border border-[var(--color-green)]/30">
+              <p class="text-[var(--color-green)] mb-2">ALLOWED</p>
+              <ul class="space-y-1 text-[var(--color-white)]/60">
+                <li>&gt; Infrastructure can reach all zones (management)</li>
+                <li>&gt; Trusted can reach infrastructure (admin tasks)</li>
+                <li>&gt; Trusted can view surveillance (camera access)</li>
+                <li>&gt; Media zones can reach media services (Plex)</li>
+                <li>&gt; All zones reach DNS server (Pi-hole)</li>
+                <li>&gt; VPN clients route into trusted zone</li>
+              </ul>
+            </div>
+            <div class="p-3 rounded bg-[var(--color-bg)] border border-red-400/30">
+              <p class="text-red-400 mb-2">BLOCKED</p>
+              <ul class="space-y-1 text-[var(--color-white)]/60">
+                <li>&gt; IoT cannot reach any internal zone</li>
+                <li>&gt; Guests cannot reach any internal resource</li>
+                <li>&gt; Surveillance has zero internet access</li>
+                <li>&gt; Work devices cannot reach personal devices</li>
+                <li>&gt; Children cannot bypass content filtering</li>
+                <li>&gt; No lateral movement between low-trust zones</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </RetroWindow>
+
+      <!-- Segmentation Philosophy -->
+      <RetroWindow title="WHY 9 VLANS FOR A HOME NETWORK">
+        <div class="font-body text-sm text-[var(--color-white)]/80 leading-relaxed space-y-4">
+          <p>
+            The short answer: because flat networks are a single-exploit environment.
+            One compromised IoT lightbulb on a flat network can sniff traffic from your
+            work laptop, your kids' devices, and your security cameras.
+          </p>
+          <p>
+            Each VLAN represents a trust boundary. Devices within a zone share a trust level.
+            Devices across zones cannot communicate unless there's an explicit firewall rule
+            allowing it. This is the same model used in enterprise data centers, applied
+            to a home with four kids and a lot of smart devices.
+          </p>
+          <p>
+            The Twilight Zone naming convention makes it easier to remember what each zone does.
+            "Is this device in The Machine Realm or Junior Dimension?" is a more intuitive
+            question than "Is this on VLAN [redacted] or VLAN [redacted]?"
+          </p>
+        </div>
+      </RetroWindow>
+    </div>
+  </section>
+</BaseLayout>

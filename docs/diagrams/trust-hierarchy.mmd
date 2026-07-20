@@ -1,0 +1,52 @@
+%% Trust hierarchy across the seven trust levels.
+%%
+%% This diagram uses TWO edge styles on purpose, because conflating them is the
+%% easiest way to misread a segmented network:
+%%
+%%   dotted, unlabelled  = descending trust. An ordering, NOT a route. Adjacency
+%%                         here implies nothing about reachability.
+%%   solid, labelled     = an actual permitted path -- a written firewall exception.
+%%
+%% The default between any two zones is deny. Every solid edge below is one of the
+%% short list of exceptions, and each exists for a stated reason. The earlier
+%% version of this diagram drew the trust ordering with plain arrows, which read as
+%% "trusted can reach work can reach media can reach IoT" -- the opposite of the
+%% policy it was illustrating.
+graph TD
+    INFRA["Infrastructure<br/>Management Plane"]
+    TRUSTED["Trusted Personal<br/>Admin Devices"]
+    WORK["Work Devices<br/>Employer-Managed"]
+    KIDS["Children's Devices<br/>Content-Filtered"]
+    MEDIA["Media / Streaming<br/>Entertainment"]
+    IOT["IoT Devices<br/>Smart Home"]
+    GUEST["Guest Network<br/>Internet Only"]
+    CAM["Surveillance<br/>No Route Out"]
+
+    INFRA -.- TRUSTED
+    TRUSTED -.- WORK
+    TRUSTED -.- KIDS
+    WORK -.- MEDIA
+    KIDS -.- MEDIA
+    MEDIA -.- IOT
+    IOT -.- GUEST
+
+    INFRA ==>|"management"| WORK
+    INFRA ==>|"management"| KIDS
+    INFRA ==>|"management"| MEDIA
+    INFRA ==>|"management"| IOT
+    INFRA ==>|"management"| GUEST
+    TRUSTED ==>|"administration"| INFRA
+    TRUSTED ==>|"camera viewing"| CAM
+
+    classDef infra stroke-width:3px
+    classDef trusted stroke-width:2px
+    classDef restricted stroke-width:2px,stroke-dasharray:3 2
+    classDef lowtrust stroke-width:1px
+    classDef blocked stroke-width:3px,stroke-dasharray:2 2
+
+    class INFRA infra
+    class TRUSTED trusted
+    class WORK,KIDS restricted
+    class MEDIA,IOT lowtrust
+    class GUEST lowtrust
+    class CAM blocked

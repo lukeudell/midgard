@@ -1,0 +1,18 @@
+%% DNS resolution chain. The point of the diagram is the absence of an arrow:
+%% there is no edge from any node to a third-party resolver, because there is no
+%% forwarder configured anywhere in the chain.
+graph LR
+    CLIENT["Any Device<br/>Every Zone"] -->|"DNS query"| FILTER["Filtering Resolver<br/>Blocklists + Cache"]
+    FILTER -->|"Allowed"| RECURSE["Recursive Resolver<br/>Walks from the root"]
+    RECURSE -->|"Direct query"| AUTH["Authoritative<br/>Nameservers"]
+    FILTER -.->|"Blocked"| SINK["Sinkhole<br/>Null response"]
+
+    classDef client stroke-width:1px
+    classDef infra stroke-width:3px
+    classDef external stroke-width:2px,stroke-dasharray:4 3
+    classDef denied stroke-width:2px,stroke-dasharray:2 2
+
+    class CLIENT client
+    class FILTER,RECURSE infra
+    class AUTH external
+    class SINK denied

@@ -1,0 +1,75 @@
+name: CI
+
+# This repository has no application, so CI does the one job that matters here:
+# it enforces the sanitisation rule. The other four extracted projects check that
+# their code works; this one checks that its words are safe to publish.
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sanitisation:
+    name: Sanitisation guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for anything that should not be public
+        # Blocking, deliberately. This is the one control standing between a
+        # late-night edit and a published address.
+        run: bash scripts/check-sanitisation.sh
+
+  contract:
+    name: project.yaml satisfies the import contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - name: Validate against the portfolio import contract
+        # why: the importer is the authority, but it lives in another repository and
+        # can only be reached through the admin UI. Catching a bad key here turns a
+        # round trip into a second.
+        run: python scripts/check-project-yaml.py
+
+  diagrams:
+    name: Diagrams match their inlined copies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check project.yaml embeds against docs/diagrams
+        # why: the mermaid embed kind takes diagram text rather than a path, so each
+        # diagram necessarily exists twice. Drift between the two is silent -- the
+        # published diagram just quietly stops matching the reviewed one.
+        run: bash scripts/check-diagram-drift.sh
+
+  links:
+    name: Internal links resolve
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check relative markdown links
+        # why: the documentation IS the deliverable here, so a broken cross-reference
+        # is a real defect rather than cosmetic. Only relative links are checked --
+        # external ones rot for reasons outside this repo and would make CI flaky.
+        run: |
+          status=0
+          while IFS= read -r line; do
+            file="${line%%:*}"
+            target=$(printf '%s' "$line" | sed -E 's/.*\]\(([^)#]+).*/\1/')
+            case "$target" in
+              http*|mailto:*|"") continue ;;
+            esac
+            resolved="$(dirname "$file")/$target"
+            if [ ! -e "$resolved" ]; then
+              echo "broken link in $file -> $target"
+              status=1
+            fi
+          done < <(grep -rIn --include='*.md' -oE '\]\([^)]+\)' . || true)
+          exit $status

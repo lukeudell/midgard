@@ -1,0 +1,29 @@
+%% Service dependency map for the always-on infrastructure node.
+%% This is the diagram that shows the accepted single point of failure: everything
+%% on the left column hangs off one device. The case study states the blast radius
+%% rather than the diagram hiding it.
+graph TD
+    PI["Infrastructure Node<br/>Always On"] --> FILTER["Filtering Resolver<br/>DNS Blocklists"]
+    PI --> RECURSE["Recursive Resolver<br/>Root-Walking DNS"]
+    PI --> VPN["WireGuard<br/>VPN Server"]
+    PI --> ETL["Telemetry ETL<br/>Python on a systemd timer"]
+    PI --> WOL["Wake-on-LAN<br/>Power Management"]
+    PI --> HMI["Touchscreen HMI<br/>Live Status"]
+
+    FILTER --> RECURSE
+    ETL --> DB[("PostgreSQL<br/>Telemetry Store")]
+    ETL --> ALERTS["Email Alerts<br/>Offline / New Device"]
+    WOL -->|"Magic packet"| SRV["Compute Server"]
+    SRV --> MEDIA["Media Services"]
+    SRV --> AUTOMATION["Media Automation"]
+    VPN -.->|"Remote access"| PI
+
+    classDef infra stroke-width:3px
+    classDef data stroke-width:2px
+    classDef ondemand stroke-width:2px
+    classDef signal stroke-width:1px
+
+    class PI,FILTER,RECURSE,VPN infra
+    class ETL,DB data
+    class SRV,MEDIA,AUTOMATION ondemand
+    class WOL,HMI,ALERTS signal

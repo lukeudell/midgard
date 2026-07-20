@@ -1,0 +1,13 @@
+# Dependency updates. Weekly rather than daily: this is a portfolio, not a
+# product, and a PR every morning becomes noise you stop reading.
+#
+# Grouped by ecosystem so one PR covers a coherent set of bumps.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]

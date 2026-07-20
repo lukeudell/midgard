@@ -1,0 +1,298 @@
+# project.yaml for midgard (Home Network)
+# Import at /admin/import on lukeudell.com; the diff is shown before anything applies.
+# Brief: luke-udell-portfolio/docs/contracts/project-config-handoff.md
+#
+# DRAFT, written at extraction from docs/CASE_STUDY.md.
+# SANITISATION: no IPs, subnets, hostnames, VLAN numbers or vendor model numbers.
+# Re-check every value here against that rule before publishing. The source of
+# truth is the PRIVATE vault; nothing may be pasted from it into this file.
+contract_version: "1.1"
+slug: home-network
+title: Home Network
+summary: A residential network run like production infrastructure, with nine segmented trust zones, default-deny between them, and documentation treated as a deliverable.
+published: false
+tags: [networking, documentation, self-hosting]
+
+sections:
+  - slug: overview
+    title: Overview
+    published: true
+    body: |
+      A home network built and operated the way production infrastructure is:
+      segmented into trust zones, default-deny between them, recursive DNS kept
+      local so no third party sees a query, surveillance that never touches the
+      internet, and every firewall rule explicit and written down.
+
+      It sits on a data engineering portfolio for a reason. The other projects show
+      pipelines. This one shows what the same person does with infrastructure when
+      nobody is paying them to, which is usually the better signal.
+
+      Everything here is sanitised: zone names rather than identifiers, roles rather
+      than addresses. It is an architecture showcase, not an invitation.
+    embeds:
+      # Inlined from docs/diagrams/topology.mmd -- the mermaid embed kind takes
+      # diagram text, not a path. scripts/check-diagram-drift.sh keeps the two in sync.
+      - kind: mermaid
+        title: Network topology
+        source: |
+          graph TD
+              ISP["Internet"] --> MODEM["Cable Modem<br/>Bridge Mode"]
+              MODEM --> GW["Gateway / Firewall<br/>Routing + Control Plane"]
+              GW --> SW["Core Switch<br/>Managed PoE, VLAN Trunking"]
+
+              SW --> AP["Wireless APs<br/>SSID to Zone Mapping"]
+              SW --> PI["Infrastructure Node<br/>DNS / VPN / ETL / WoL"]
+              SW --> SRV["Compute Server<br/>Powered On Demand"]
+              SW --> NVR["Video Recorder<br/>Air-Gapped"]
+              SW --> CAMS["Surveillance Cameras<br/>Local Recording Only"]
+
+              AP --> WIFI["Wireless Clients<br/>Zone assigned by SSID"]
+              SW --> WIRED["Wired Clients<br/>Zone assigned by port"]
+
+              classDef external stroke-width:2px,stroke-dasharray:4 3
+              classDef critical stroke-width:3px
+              classDef infra stroke-width:3px
+              classDef ondemand stroke-width:2px
+              classDef isolated stroke-width:3px,stroke-dasharray:2 2
+              classDef client stroke-width:1px
+
+              class ISP,MODEM external
+              class GW,SW critical
+              class PI infra
+              class SRV ondemand
+              class NVR,CAMS isolated
+              class AP,WIFI,WIRED client
+
+  - slug: documentation
+    title: Documentation as a Deliverable
+    published: true
+    body: |
+      This section is second rather than last on purpose. The segmentation model below
+      is the more impressive artifact, but the documentation is the one that says
+      whether any of it survives the person who built it.
+
+      The network is documented in four numbered sections: configuration, reference,
+      operations, and scripts. Operations is the largest by design, because that is
+      the section future-you reads at 11pm when something is down. A living document
+      tracks what has not been written yet, which makes documentation debt visible the
+      way a backlog makes feature debt visible.
+
+      The structure maps onto software practice directly. Configuration is
+      infrastructure-as-code and environment setup. Reference is architecture decision
+      records and standards. Operations is runbooks and incident playbooks. Scripts is
+      CI/CD and migrations. The gap-tracking document is a documentation debt backlog.
+
+      That mapping is not an analogy. It is the same practice applied to a house
+      instead of a deployment, and it is why this project sits on a data engineering
+      portfolio at all: a pipeline nobody can operate after you leave is not finished.
+
+  - slug: philosophy
+    title: Design Philosophy
+    published: true
+    body: |
+      > Everything denied by default. Anything allowed is explicit, documented, and
+      > intentional.
+
+      Flat networks are single-exploit environments. One compromised smart bulb sits
+      on the same broadcast domain as the work laptop, the children's tablets and
+      the cameras. Segmentation means a compromise has somewhere it cannot go.
+
+      That is the whole argument, and it is the same argument as least privilege in
+      a database. The question is never "is this device trusted" but "what is the
+      blast radius when it is not".
+
+  - slug: segmentation
+    title: Nine Zones, Seven Trust Levels
+    published: true
+    body: |
+      Each zone is a trust boundary, not a convenience. They are named after
+      Twilight Zone episodes, which is a memory aid rather than a joke: asking
+      whether something belongs in The Machine Realm or Junior Dimension is a
+      question anyone in the house can answer, and asking whether it belongs in one
+      numbered VLAN or another is not.
+
+      | Zone | Holds | Trust | Internet |
+      |---|---|---|---|
+      | The Fifth Dimension | Network infrastructure, management plane | Highest | Yes |
+      | Beyond the Pale | Trusted personal devices with admin access | High | Yes |
+      | Sector 51 | Employer-managed work devices | Isolated | Yes |
+      | Junior Dimension | Children's devices, content-filtered | Restricted | Filtered |
+      | The Viewing Chamber | Televisions and streaming devices | Low | Yes |
+      | The Loading Dock | Media ingest and download quarantine | Low | Yes |
+      | The Machine Realm | IoT and smart home | Very low | Limited |
+      | The Outer Limits | Guest devices | Lowest | Yes |
+      | The Surveillance Sector | Cameras and recorder | Special | Blocked |
+
+      The default is deny all. What is permitted is short and deliberate:
+      infrastructure reaches everything for management, trusted devices reach
+      infrastructure and the cameras, media zones reach media services, everything
+      reaches DNS, and VPN clients land in the trusted zone.
+
+      Two rules are worth stating plainly. Work devices cannot reach personal ones,
+      which protects the employer as much as the household. And the surveillance
+      zone is blocked outbound entirely: cameras record locally and remote viewing
+      happens over the VPN rather than through a vendor's cloud relay, so footage
+      never leaves the building.
+    embeds:
+      # Inlined from docs/diagrams/trust-hierarchy.mmd
+      - kind: mermaid
+        title: Trust hierarchy and permitted paths
+        source: |
+          graph TD
+              INFRA["Infrastructure<br/>Management Plane"]
+              TRUSTED["Trusted Personal<br/>Admin Devices"]
+              WORK["Work Devices<br/>Employer-Managed"]
+              KIDS["Children's Devices<br/>Content-Filtered"]
+              MEDIA["Media / Streaming<br/>Entertainment"]
+              IOT["IoT Devices<br/>Smart Home"]
+              GUEST["Guest Network<br/>Internet Only"]
+              CAM["Surveillance<br/>No Route Out"]
+
+              INFRA -.- TRUSTED
+              TRUSTED -.- WORK
+              TRUSTED -.- KIDS
+              WORK -.- MEDIA
+              KIDS -.- MEDIA
+              MEDIA -.- IOT
+              IOT -.- GUEST
+
+              INFRA ==>|"management"| WORK
+              INFRA ==>|"management"| KIDS
+              INFRA ==>|"management"| MEDIA
+              INFRA ==>|"management"| IOT
+              INFRA ==>|"management"| GUEST
+              TRUSTED ==>|"administration"| INFRA
+              TRUSTED ==>|"camera viewing"| CAM
+
+              classDef infra stroke-width:3px
+              classDef trusted stroke-width:2px
+              classDef restricted stroke-width:2px,stroke-dasharray:3 2
+              classDef lowtrust stroke-width:1px
+              classDef blocked stroke-width:3px,stroke-dasharray:2 2
+
+              class INFRA infra
+              class TRUSTED trusted
+              class WORK,KIDS restricted
+              class MEDIA,IOT lowtrust
+              class GUEST lowtrust
+              class CAM blocked
+
+  - slug: dns
+    title: DNS Sovereignty
+    published: true
+    body: |
+      Filtering resolves locally, then recursion goes straight to the authoritative
+      nameservers. No third-party resolver ever sees a query: not the ISP, not
+      Cloudflare, not Google.
+
+      The distinction that matters is between filtering and control. Using a public
+      resolver that blocks ads trades one observer for another. Running recursion
+      locally means the query log exists in exactly one place, on hardware in the
+      house.
+
+      DNSSEC is validated. Encrypted DNS and direct resolver queries are blocked at
+      the firewall, because a filter a device can route around is not a filter. Any
+      television that hardcodes its own resolver would otherwise simply ignore it.
+    embeds:
+      # Inlined from docs/diagrams/dns-resolution.mmd
+      - kind: mermaid
+        title: DNS resolution chain
+        source: |
+          graph LR
+              CLIENT["Any Device<br/>Every Zone"] -->|"DNS query"| FILTER["Filtering Resolver<br/>Blocklists + Cache"]
+              FILTER -->|"Allowed"| RECURSE["Recursive Resolver<br/>Walks from the root"]
+              RECURSE -->|"Direct query"| AUTH["Authoritative<br/>Nameservers"]
+              FILTER -.->|"Blocked"| SINK["Sinkhole<br/>Null response"]
+
+              classDef client stroke-width:1px
+              classDef infra stroke-width:3px
+              classDef external stroke-width:2px,stroke-dasharray:4 3
+              classDef denied stroke-width:2px,stroke-dasharray:2 2
+
+              class CLIENT client
+              class FILTER,RECURSE infra
+              class AUTH external
+              class SINK denied
+
+  - slug: decisions
+    title: Four Decisions and What They Cost
+    published: true
+    body: |
+      Each of these cost something, and the cost is the part worth reading.
+
+      **Bridge-mode modem.** The ISP's box does no routing, so there is no double NAT
+      and no vendor-controlled routing layer sitting above the firewall rules. Every
+      filtering decision is made by equipment under local control. It also means the
+      gateway is the only thing between the network and the internet, with no
+      accidental second layer to fall back on.
+
+      **On-demand compute.** The compute server draws real power at idle and its
+      workloads are episodic, so the infrastructure node manages its power lifecycle
+      rather than leaving it running. First use pays for that in startup latency, and
+      the server cannot come up at all if the infrastructure node is down.
+
+      **Air-gapped surveillance.** The cameras have no internet access at all. Not
+      filtered, not restricted. None. Remote viewing goes over the VPN and then
+      locally, which costs convenience: there is no app that just works from anywhere,
+      and every viewer needs a VPN config. That trade was made deliberately, because a
+      camera network that phones out is one whose footage is somebody else's problem.
+
+      **A single infrastructure node.** DNS, VPN, telemetry and power management all
+      run on one always-on device. This is an accepted single point of failure, and
+      the blast radius was reasoned about before it was accepted: if it dies the
+      gateway keeps routing and the network keeps working. What is lost is filtering
+      and VPN access: degraded, not down. That distinction is why the trade-off is
+      acceptable in a house and would not be in a data centre.
+
+  - slug: telemetry
+    title: Network Telemetry
+    published: true
+    body: |
+      The network runs a Python ETL on a systemd timer every fifteen minutes, pulling
+      device state, client connections, traffic statistics and events from the
+      controller's API into a local PostgreSQL instance.
+
+      The implementation is private. It runs on the infrastructure node and is
+      documented in a private vault, not published here. What follows is its design.
+
+      The stored history is what makes it more than a status page. It supports
+      alerting on devices going offline and unfamiliar clients appearing; historical
+      analysis of traffic trends and uptime; anomaly detection for unexpected devices
+      and firmware drift; and an audit trail of which client connected when, to which
+      zone, and how much bandwidth it used.
+
+      The pattern is the same one used professionally: scheduled extraction from an
+      API, loaded into a relational store, with a history worth querying rather than a
+      dashboard worth glancing at. The distinction between monitoring and telemetry is
+      whether you can ask questions about last month.
+    embeds:
+      # Inlined from docs/diagrams/service-map.mmd
+      - kind: mermaid
+        title: Infrastructure node service map
+        source: |
+          graph TD
+              PI["Infrastructure Node<br/>Always On"] --> FILTER["Filtering Resolver<br/>DNS Blocklists"]
+              PI --> RECURSE["Recursive Resolver<br/>Root-Walking DNS"]
+              PI --> VPN["WireGuard<br/>VPN Server"]
+              PI --> ETL["Telemetry ETL<br/>Python on a systemd timer"]
+              PI --> WOL["Wake-on-LAN<br/>Power Management"]
+              PI --> HMI["Touchscreen HMI<br/>Live Status"]
+
+              FILTER --> RECURSE
+              ETL --> DB[("PostgreSQL<br/>Telemetry Store")]
+              ETL --> ALERTS["Email Alerts<br/>Offline / New Device"]
+              WOL -->|"Magic packet"| SRV["Compute Server"]
+              SRV --> MEDIA["Media Services"]
+              SRV --> AUTOMATION["Media Automation"]
+              VPN -.->|"Remote access"| PI
+
+              classDef infra stroke-width:3px
+              classDef data stroke-width:2px
+              classDef ondemand stroke-width:2px
+              classDef signal stroke-width:1px
+
+              class PI,FILTER,RECURSE,VPN infra
+              class ETL,DB data
+              class SRV,MEDIA,AUTOMATION ondemand
+              class WOL,HMI,ALERTS signal
+
