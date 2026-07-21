@@ -50,12 +50,12 @@ sections:
               AP --> WIFI["Wireless Clients<br/>Zone assigned by SSID"]
               SW --> WIRED["Wired Clients<br/>Zone assigned by port"]
 
-              classDef external stroke-width:2px,stroke-dasharray:4 3
-              classDef critical stroke-width:3px
-              classDef infra stroke-width:3px
-              classDef ondemand stroke-width:2px
-              classDef isolated stroke-width:3px,stroke-dasharray:2 2
-              classDef client stroke-width:1px
+              classDef external stroke:#FF6B35,stroke-width:2px,stroke-dasharray:4 3
+              classDef critical stroke:#00FFFF,stroke-width:3px
+              classDef infra stroke:#39FF14,stroke-width:3px
+              classDef ondemand stroke:#FF00FF,stroke-width:2px
+              classDef isolated stroke:#FF6B35,stroke-width:3px,stroke-dasharray:2 2
+              classDef client stroke:#E8E8E8,stroke-width:1px
 
               class ISP,MODEM external
               class GW,SW critical
@@ -165,9 +165,9 @@ sections:
               TRUSTED ==>|"administration"| INFRA
               TRUSTED ==>|"camera viewing"| CAM
 
-              classDef infra stroke-width:3px
-              classDef trusted stroke-width:2px
-              classDef restricted stroke-width:2px,stroke-dasharray:3 2
+              classDef infra stroke:#39FF14,stroke-width:3px
+              classDef trusted stroke:#39FF14,stroke-width:2px
+              classDef restricted stroke:#FF6B35,stroke-width:2px,stroke-dasharray:3 2
               classDef lowtrust stroke-width:1px
               classDef blocked stroke-width:3px,stroke-dasharray:2 2
 
@@ -205,9 +205,9 @@ sections:
               RECURSE -->|"Direct query"| AUTH["Authoritative<br/>Nameservers"]
               FILTER -.->|"Blocked"| SINK["Sinkhole<br/>Null response"]
 
-              classDef client stroke-width:1px
-              classDef infra stroke-width:3px
-              classDef external stroke-width:2px,stroke-dasharray:4 3
+              classDef client stroke:#E8E8E8,stroke-width:1px
+              classDef infra stroke:#39FF14,stroke-width:3px
+              classDef external stroke:#FF6B35,stroke-width:2px,stroke-dasharray:4 3
               classDef denied stroke-width:2px,stroke-dasharray:2 2
 
               class CLIENT client
@@ -287,9 +287,9 @@ sections:
               SRV --> AUTOMATION["Media Automation"]
               VPN -.->|"Remote access"| PI
 
-              classDef infra stroke-width:3px
+              classDef infra stroke:#39FF14,stroke-width:3px
               classDef data stroke-width:2px
-              classDef ondemand stroke-width:2px
+              classDef ondemand stroke:#FF00FF,stroke-width:2px
               classDef signal stroke-width:1px
 
               class PI,FILTER,RECURSE,VPN infra
