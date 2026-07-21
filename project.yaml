@@ -50,12 +50,12 @@ sections:
               AP --> WIFI["Wireless Clients<br/>Zone assigned by SSID"]
               SW --> WIRED["Wired Clients<br/>Zone assigned by port"]
 
-              classDef external stroke:#FF6B35,stroke-width:2px,stroke-dasharray:4 3
-              classDef critical stroke:#00FFFF,stroke-width:3px
-              classDef infra stroke:#39FF14,stroke-width:3px
-              classDef ondemand stroke:#FF00FF,stroke-width:2px
-              classDef isolated stroke:#FF6B35,stroke-width:3px,stroke-dasharray:2 2
-              classDef client stroke:#E8E8E8,stroke-width:1px
+              classDef external fill:#0B0014,stroke:#FF6B35,stroke-width:2px,stroke-dasharray:4 3,color:#FF6B35
+              classDef critical fill:#0B0014,stroke:#00FFFF,stroke-width:3px,color:#00FFFF
+              classDef infra fill:#0B0014,stroke:#39FF14,stroke-width:3px,color:#39FF14
+              classDef ondemand fill:#0B0014,stroke:#FF00FF,stroke-width:2px,color:#FF00FF
+              classDef isolated fill:#0B0014,stroke:#FF6B35,stroke-width:3px,stroke-dasharray:2 2,color:#FF6B35
+              classDef client fill:#0B0014,stroke:#E8E8E8,stroke-width:1px,color:#E8E8E8
 
               class ISP,MODEM external
               class GW,SW critical
@@ -165,9 +165,9 @@ sections:
               TRUSTED ==>|"administration"| INFRA
               TRUSTED ==>|"camera viewing"| CAM
 
-              classDef infra stroke:#39FF14,stroke-width:3px
-              classDef trusted stroke:#39FF14,stroke-width:2px
-              classDef restricted stroke:#FF6B35,stroke-width:2px,stroke-dasharray:3 2
+              classDef infra fill:#0B0014,stroke:#39FF14,stroke-width:3px,color:#39FF14
+              classDef trusted fill:#0B0014,stroke:#39FF14,stroke-width:2px,color:#39FF14
+              classDef restricted fill:#0B0014,stroke:#FF6B35,stroke-width:2px,stroke-dasharray:3 2,color:#FF6B35
               classDef lowtrust stroke-width:1px
               classDef blocked stroke-width:3px,stroke-dasharray:2 2
 
@@ -205,9 +205,9 @@ sections:
               RECURSE -->|"Direct query"| AUTH["Authoritative<br/>Nameservers"]
               FILTER -.->|"Blocked"| SINK["Sinkhole<br/>Null response"]
 
-              classDef client stroke:#E8E8E8,stroke-width:1px
-              classDef infra stroke:#39FF14,stroke-width:3px
-              classDef external stroke:#FF6B35,stroke-width:2px,stroke-dasharray:4 3
+              classDef client fill:#0B0014,stroke:#E8E8E8,stroke-width:1px,color:#E8E8E8
+              classDef infra fill:#0B0014,stroke:#39FF14,stroke-width:3px,color:#39FF14
+              classDef external fill:#0B0014,stroke:#FF6B35,stroke-width:2px,stroke-dasharray:4 3,color:#FF6B35
               classDef denied stroke-width:2px,stroke-dasharray:2 2
 
               class CLIENT client
@@ -287,9 +287,9 @@ sections:
               SRV --> AUTOMATION["Media Automation"]
               VPN -.->|"Remote access"| PI
 
-              classDef infra stroke:#39FF14,stroke-width:3px
+              classDef infra fill:#0B0014,stroke:#39FF14,stroke-width:3px,color:#39FF14
               classDef data stroke-width:2px
-              classDef ondemand stroke:#FF00FF,stroke-width:2px
+              classDef ondemand fill:#0B0014,stroke:#FF00FF,stroke-width:2px,color:#FF00FF
               classDef signal stroke-width:1px
 
               class PI,FILTER,RECURSE,VPN infra
