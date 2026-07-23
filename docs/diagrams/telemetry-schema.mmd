@@ -1,0 +1,46 @@
+erDiagram
+    DEVICES {
+        text device_key
+        varchar model
+        varchar zone
+        varchar firmware_version
+        timestamptz first_seen
+        timestamptz last_seen
+        boolean online
+    }
+    CLIENTS {
+        text client_key
+        varchar hostname
+        varchar zone_assigned
+        varchar client_type
+        timestamptz first_seen
+    }
+    CLIENT_CONNECTIONS {
+        bigint connection_id
+        text client_key
+        text device_key
+        varchar zone
+        timestamptz connected_at
+        timestamptz disconnected_at
+        bigint bytes_up
+        bigint bytes_down
+    }
+    TRAFFIC_SAMPLES {
+        bigint sample_id
+        text device_key
+        timestamptz sampled_at
+        bigint bytes_up
+        bigint bytes_down
+        integer active_clients
+    }
+    EVENTS {
+        bigint event_id
+        text device_key
+        varchar event_type
+        varchar severity
+        timestamptz occurred_at
+    }
+    CLIENT_CONNECTIONS ||--o{ CLIENTS : "client_key"
+    CLIENT_CONNECTIONS ||--o{ DEVICES : "device_key"
+    TRAFFIC_SAMPLES ||--o{ DEVICES : "device_key"
+    EVENTS ||--o{ DEVICES : "device_key"

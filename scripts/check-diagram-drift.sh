@@ -28,6 +28,7 @@ declare -A DIAGRAMS=(
   ["docs/diagrams/trust-hierarchy.mmd"]="Trust hierarchy and permitted paths"
   ["docs/diagrams/dns-resolution.mmd"]="DNS resolution chain"
   ["docs/diagrams/service-map.mmd"]="Infrastructure node service map"
+  ["docs/diagrams/telemetry-schema.mmd"]="Telemetry store -- the design"
 )
 
 # why: compare the diagram, not the YAML indentation depth it happens to sit at.
