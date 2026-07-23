@@ -69,6 +69,7 @@ sections:
               class AP,WIFI,WIRED client
   - slug: documentation
     title: Documentation as a Deliverable
+    nav_label: Documentation
     published: true
     body: |
       This section is second rather than last on purpose. The segmentation model below
@@ -92,6 +93,7 @@ sections:
 
   - slug: philosophy
     title: Design Philosophy
+    nav_label: Philosophy
     published: true
     body: |
       > Everything denied by default. Anything allowed is explicit, documented, and
@@ -107,6 +109,7 @@ sections:
 
   - slug: segmentation
     title: Nine Zones, Seven Trust Levels
+    nav_label: Segmentation
     published: true
     body: |
       Each zone is a trust boundary, not a convenience. They are named after
@@ -196,6 +199,7 @@ sections:
               class CAM blocked
   - slug: dns
     title: DNS Sovereignty
+    nav_label: DNS
     published: true
     body: |
       Filtering resolves locally, then recursion goes straight to the authoritative
@@ -235,6 +239,7 @@ sections:
               class SINK denied
   - slug: decisions
     title: Four Decisions and What They Cost
+    nav_label: Decisions
     published: true
     body: |
       Each of these cost something, and the cost is the part worth reading.
@@ -265,6 +270,7 @@ sections:
 
   - slug: telemetry
     title: Network Telemetry
+    nav_label: Telemetry
     published: true
     body: |
       The network runs a Python ETL on a systemd timer every fifteen minutes, pulling
