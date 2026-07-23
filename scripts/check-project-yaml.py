@@ -29,7 +29,7 @@ TOP_LEVEL = {
     "demo", "services",
 }
 TOP_REQUIRED = {"contract_version", "slug", "title", "summary", "sections"}
-SECTION_KEYS = {"slug", "title", "published", "body", "embeds"}
+SECTION_KEYS = {"slug", "title", "nav_label", "published", "body", "embeds"}
 SECTION_REQUIRED = {"slug", "title"}
 EMBED_KEYS = {"kind", "title", "source", "aspect_ratio", "fallback_url"}
 EMBED_REQUIRED = {"kind", "title", "source"}
