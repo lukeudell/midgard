@@ -15,14 +15,16 @@ the check to find out what to paste.
 | `trust-hierarchy.mmd` | Seven trust levels and the permitted exceptions between them | `segmentation.astro` |
 | `dns-resolution.mmd` | Query path from device to authoritative nameserver | `services.astro` |
 | `service-map.mmd` | Services on the always-on infrastructure node | `services.astro` |
+| `telemetry-schema.mmd` | The telemetry store's data model (the design; the implementation is private) | authored 2026-07-23 |
 
 ## What changed during extraction
 
-**Colour was removed.** The inline versions carried hardcoded hex in `style`
-directives, belonging to the old site's vaporwave theme. They now use `classDef` with
-semantic class names (`infra`, `trusted`, `restricted`, `blocked`) that describe the
-trust tier rather than a palette. If a class needs a colour it should be assigned once,
-in the theme, where a redesign can change it in one place.
+**Colour moved from per-node `style` directives to `classDef`s.** The class names
+(`infra`, `trusted`, `restricted`, `blocked`) describe the trust tier, and the hex
+literals on them are not decoration: the portfolio's diagram renderer treats each hue
+as a semantic slot key and resolves it through the active theme's tokens, so a redesign
+recolours every diagram in one place without touching these files. Removing the hex
+entirely would leave the renderer nothing to map and the diagrams grey.
 
 **`trust-hierarchy.mmd` was corrected, not just moved.** See the comment at the top of
 that file. The original drew the trust ordering with the same plain arrows used

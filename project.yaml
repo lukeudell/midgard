@@ -36,6 +36,10 @@ sections:
       - kind: mermaid
         title: Network topology
         source: |
+          %% Network topology: the physical path from the internet inward.
+          %% Nodes are ROLES, never hostnames or addresses -- see CLAUDE.md. A reader should
+          %% be able to rebuild the shape of this network without being able to find it.
+          %% Colour is left to the renderer; classes carry the trust tier, not a palette.
           graph TD
               ISP["Internet"] --> MODEM["Cable Modem<br/>Bridge Mode"]
               MODEM --> GW["Gateway / Firewall<br/>Routing + Control Plane"]
@@ -50,12 +54,12 @@ sections:
               AP --> WIFI["Wireless Clients<br/>Zone assigned by SSID"]
               SW --> WIRED["Wired Clients<br/>Zone assigned by port"]
 
-              classDef external fill:#0B0014,stroke:#FF6B35,stroke-width:2px,stroke-dasharray:4 3,color:#FF6B35
-              classDef critical fill:#0B0014,stroke:#00FFFF,stroke-width:3px,color:#00FFFF
-              classDef infra fill:#0B0014,stroke:#39FF14,stroke-width:3px,color:#39FF14
-              classDef ondemand fill:#0B0014,stroke:#FF00FF,stroke-width:2px,color:#FF00FF
-              classDef isolated fill:#0B0014,stroke:#FF6B35,stroke-width:3px,stroke-dasharray:2 2,color:#FF6B35
-              classDef client fill:#0B0014,stroke:#E8E8E8,stroke-width:1px,color:#E8E8E8
+              classDef external stroke-width:2px,stroke-dasharray:4 3
+              classDef critical stroke-width:3px
+              classDef infra stroke-width:3px
+              classDef ondemand stroke-width:2px
+              classDef isolated stroke-width:3px,stroke-dasharray:2 2
+              classDef client stroke-width:1px
 
               class ISP,MODEM external
               class GW,SW critical
@@ -63,7 +67,6 @@ sections:
               class SRV ondemand
               class NVR,CAMS isolated
               class AP,WIFI,WIRED client
-
   - slug: documentation
     title: Documentation as a Deliverable
     published: true
@@ -139,6 +142,20 @@ sections:
       - kind: mermaid
         title: Trust hierarchy and permitted paths
         source: |
+          %% Trust hierarchy across the seven trust levels.
+          %%
+          %% This diagram uses TWO edge styles on purpose, because conflating them is the
+          %% easiest way to misread a segmented network:
+          %%
+          %%   dotted, unlabelled  = descending trust. An ordering, NOT a route. Adjacency
+          %%                         here implies nothing about reachability.
+          %%   solid, labelled     = an actual permitted path -- a written firewall exception.
+          %%
+          %% The default between any two zones is deny. Every solid edge below is one of the
+          %% short list of exceptions, and each exists for a stated reason. The earlier
+          %% version of this diagram drew the trust ordering with plain arrows, which read as
+          %% "trusted can reach work can reach media can reach IoT" -- the opposite of the
+          %% policy it was illustrating.
           graph TD
               INFRA["Infrastructure<br/>Management Plane"]
               TRUSTED["Trusted Personal<br/>Admin Devices"]
@@ -165,9 +182,9 @@ sections:
               TRUSTED ==>|"administration"| INFRA
               TRUSTED ==>|"camera viewing"| CAM
 
-              classDef infra fill:#0B0014,stroke:#39FF14,stroke-width:3px,color:#39FF14
-              classDef trusted fill:#0B0014,stroke:#39FF14,stroke-width:2px,color:#39FF14
-              classDef restricted fill:#0B0014,stroke:#FF6B35,stroke-width:2px,stroke-dasharray:3 2,color:#FF6B35
+              classDef infra stroke-width:3px
+              classDef trusted stroke-width:2px
+              classDef restricted stroke-width:2px,stroke-dasharray:3 2
               classDef lowtrust stroke-width:1px
               classDef blocked stroke-width:3px,stroke-dasharray:2 2
 
@@ -177,7 +194,6 @@ sections:
               class MEDIA,IOT lowtrust
               class GUEST lowtrust
               class CAM blocked
-
   - slug: dns
     title: DNS Sovereignty
     published: true
@@ -199,22 +215,24 @@ sections:
       - kind: mermaid
         title: DNS resolution chain
         source: |
+          %% DNS resolution chain. The point of the diagram is the absence of an arrow:
+          %% there is no edge from any node to a third-party resolver, because there is no
+          %% forwarder configured anywhere in the chain.
           graph LR
               CLIENT["Any Device<br/>Every Zone"] -->|"DNS query"| FILTER["Filtering Resolver<br/>Blocklists + Cache"]
               FILTER -->|"Allowed"| RECURSE["Recursive Resolver<br/>Walks from the root"]
               RECURSE -->|"Direct query"| AUTH["Authoritative<br/>Nameservers"]
               FILTER -.->|"Blocked"| SINK["Sinkhole<br/>Null response"]
 
-              classDef client fill:#0B0014,stroke:#E8E8E8,stroke-width:1px,color:#E8E8E8
-              classDef infra fill:#0B0014,stroke:#39FF14,stroke-width:3px,color:#39FF14
-              classDef external fill:#0B0014,stroke:#FF6B35,stroke-width:2px,stroke-dasharray:4 3,color:#FF6B35
+              classDef client stroke-width:1px
+              classDef infra stroke-width:3px
+              classDef external stroke-width:2px,stroke-dasharray:4 3
               classDef denied stroke-width:2px,stroke-dasharray:2 2
 
               class CLIENT client
               class FILTER,RECURSE infra
               class AUTH external
               class SINK denied
-
   - slug: decisions
     title: Four Decisions and What They Cost
     published: true
@@ -267,10 +285,64 @@ sections:
       dashboard worth glancing at. The distinction between monitoring and telemetry is
       whether you can ask questions about last month.
     embeds:
+      # Inlined from docs/diagrams/telemetry-schema.mmd
+      - kind: mermaid
+        title: Telemetry store -- the design
+        source: |
+          erDiagram
+              DEVICES {
+                  text device_key
+                  varchar model
+                  varchar zone
+                  varchar firmware_version
+                  timestamptz first_seen
+                  timestamptz last_seen
+                  boolean online
+              }
+              CLIENTS {
+                  text client_key
+                  varchar hostname
+                  varchar zone_assigned
+                  varchar client_type
+                  timestamptz first_seen
+              }
+              CLIENT_CONNECTIONS {
+                  bigint connection_id
+                  text client_key
+                  text device_key
+                  varchar zone
+                  timestamptz connected_at
+                  timestamptz disconnected_at
+                  bigint bytes_up
+                  bigint bytes_down
+              }
+              TRAFFIC_SAMPLES {
+                  bigint sample_id
+                  text device_key
+                  timestamptz sampled_at
+                  bigint bytes_up
+                  bigint bytes_down
+                  integer active_clients
+              }
+              EVENTS {
+                  bigint event_id
+                  text device_key
+                  varchar event_type
+                  varchar severity
+                  timestamptz occurred_at
+              }
+              CLIENT_CONNECTIONS ||--o{ CLIENTS : "client_key"
+              CLIENT_CONNECTIONS ||--o{ DEVICES : "device_key"
+              TRAFFIC_SAMPLES ||--o{ DEVICES : "device_key"
+              EVENTS ||--o{ DEVICES : "device_key"
       # Inlined from docs/diagrams/service-map.mmd
       - kind: mermaid
         title: Infrastructure node service map
         source: |
+          %% Service dependency map for the always-on infrastructure node.
+          %% This is the diagram that shows the accepted single point of failure: everything
+          %% on the left column hangs off one device. The case study states the blast radius
+          %% rather than the diagram hiding it.
           graph TD
               PI["Infrastructure Node<br/>Always On"] --> FILTER["Filtering Resolver<br/>DNS Blocklists"]
               PI --> RECURSE["Recursive Resolver<br/>Root-Walking DNS"]
@@ -287,13 +359,12 @@ sections:
               SRV --> AUTOMATION["Media Automation"]
               VPN -.->|"Remote access"| PI
 
-              classDef infra fill:#0B0014,stroke:#39FF14,stroke-width:3px,color:#39FF14
+              classDef infra stroke-width:3px
               classDef data stroke-width:2px
-              classDef ondemand fill:#0B0014,stroke:#FF00FF,stroke-width:2px,color:#FF00FF
+              classDef ondemand stroke-width:2px
               classDef signal stroke-width:1px
 
               class PI,FILTER,RECURSE,VPN infra
               class ETL,DB data
               class SRV,MEDIA,AUTOMATION ondemand
               class WOL,HMI,ALERTS signal
-
