@@ -17,7 +17,7 @@ jobs:
     name: Sanitisation guard
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Check for anything that should not be public
         # Blocking, deliberately. This is the one control standing between a
         # late-night edit and a published address.
@@ -27,8 +27,8 @@ jobs:
     name: project.yaml satisfies the import contract
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: pip install pyyaml
@@ -42,7 +42,7 @@ jobs:
     name: Diagrams match their inlined copies
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Check project.yaml embeds against docs/diagrams
         # why: the mermaid embed kind takes diagram text rather than a path, so each
         # diagram necessarily exists twice. Drift between the two is silent -- the
@@ -53,7 +53,7 @@ jobs:
     name: Internal links resolve
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Check relative markdown links
         # why: the documentation IS the deliverable here, so a broken cross-reference
         # is a real defect rather than cosmetic. Only relative links are checked --
