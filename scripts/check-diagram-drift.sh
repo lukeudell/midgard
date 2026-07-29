@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 #
+#  file:       scripts/check-diagram-drift.sh
+#  purpose:    fail when a diagram's inlined copies drift from its canonical .mmd source
+#  owner:      Luke Udell
+#  spdx:       none
+#  std:        STD-11
+#  adr:        none
+#  ticket:     none
+#  ticket-url: none
+#  created:    2026-07-19
+#
 # Diagram drift guard.
 #
 # The portfolio's `mermaid` embed kind takes diagram TEXT, not a file path, so every

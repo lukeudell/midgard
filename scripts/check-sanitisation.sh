@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 #
+#  file:       scripts/check-sanitisation.sh
+#  purpose:    grep every push for anything that could deanonymise the real network
+#  owner:      Luke Udell
+#  spdx:       none
+#  std:        STD-05
+#  adr:        none
+#  ticket:     none
+#  ticket-url: none
+#  created:    2026-07-19
+#
 # Sanitisation guard.
 #
 # This repository is the public face of a live residential network. The rule that
@@ -34,7 +44,6 @@ STATUS=0
 # Files that are allowed to discuss the rules themselves.
 EXCLUDES=(
   ":(exclude)scripts/check-sanitisation.sh"
-  ":(exclude).claude/CLAUDE.md"
   ":(exclude).github/workflows/ci.yml"
 )
 

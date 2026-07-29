@@ -1,4 +1,13 @@
 #!/usr/bin/env python3
+#  file:       scripts/check-project-yaml.py
+#  purpose:    validate project.yaml against the portfolio import contract before handoff
+#  owner:      Luke Udell
+#  spdx:       none
+#  std:        STD-11
+#  adr:        none
+#  ticket:     none
+#  ticket-url: none
+#  created:    2026-07-20
 """Validate project.yaml against the portfolio's import contract.
 
 The importer at /admin/import is the authority and reports every problem at once.
